@@ -16,12 +16,13 @@ async def setup(ctx):
         description="Добро пожаловать! Нажми кнопку ниже, чтобы подтвердить участие и получить доступ к каналам.",
         color=0x2b2d31
     )
+    
+    embed.set_image(url="https://cdn.discordapp.com/attachments/1523336809063518318/1524041464143675492/file_00000000bfa07.jpg")
     embed.add_field(name="📜 Правила", value="Уважение и адекватность — залог нашего комьюнити.", inline=False)
     
     button = discord.ui.Button(label="ПРОЙТИ ВЕРИФИКАЦИЮ", style=discord.ButtonStyle.primary, emoji="🛡️")
 
     async def button_callback(interaction: discord.Interaction):
-        # ID роли "Участник"
         role = discord.utils.get(interaction.guild.roles, id=1523339212517019729)
         if role:
             await interaction.user.add_roles(role)
