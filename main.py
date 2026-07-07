@@ -25,7 +25,7 @@ async def setup(ctx):
     async def button_callback(interaction: discord.Interaction):
         # ID ролей
         v_role = discord.utils.get(interaction.guild.roles, id=1523339212517019729) # Верифицированный
-        u_role = discord.utils.get(interaction.guild.roles, id=1523796444312837621) # Анвериф
+        u_role = discord.utils.get(interaction.guild.roles, id=1523796444312637621) # Анвериф
         
         if v_role:
             await interaction.user.add_roles(v_role) # Даем роль
