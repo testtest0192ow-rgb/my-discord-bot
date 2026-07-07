@@ -1,46 +1,41 @@
 import discord
-import os
 from discord.ext import commands
+import os
 
-
-
-# 1. Настройка бота
 intents = discord.Intents.default()
-intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# 2. Логика кнопки
-class VerificationView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.button(label="ВЕРИФИКАЦИЯ", style=discord.ButtonStyle.primary, custom_id="verify_button_1")
-    async def verify(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # ЗАМЕНИ ЭТИ ЦИФРЫ НА ID СВОИХ РОЛЕЙ
-        role_verified_id = 1523339212517019729 
-        role_unverified_id = 1523796444312637621
-        
-        guild = interaction.guild
-        member = interaction.user
-        
-        v_role = guild.get_role(role_verified_id)
-        u_role = guild.get_role(role_unverified_id)
-        
-        await member.add_roles(v_role)
-        await member.remove_roles(u_role)
-        
-        await interaction.response.send_message("Доступ открыт.", ephemeral=True)
-
-# 3. Команда для создания кнопки
 @bot.command()
 async def setup(ctx):
-    await ctx.send("Нажми кнопку, чтобы получить роль:", view=VerificationView())
+    if not ctx.author.guild_permissions.administrator:
+        return
+
+    embed = discord.Embed(
+        title="✨ ВЕРИФИКАЦИЯ SECO", 
+        description="Добро пожаловать! Нажми кнопку ниже, чтобы подтвердить участие и получить доступ к каналам.",
+        color=0x2b2d31
+    )
+    embed.add_field(name="📜 Правила", value="Уважение и адекватность — залог нашего комьюнити.", inline=False)
+    
+    button = discord.ui.Button(label="ПРОЙТИ ВЕРИФИКАЦИЮ", style=discord.ButtonStyle.primary, emoji="🛡️")
+
+    async def button_callback(interaction: discord.Interaction):
+        # ID роли "Участник"
+        role = discord.utils.get(interaction.guild.roles, id=1523339212517019729)
+        if role:
+            await interaction.user.add_roles(role)
+            await interaction.response.send_message("Доступ открыт!", ephemeral=True)
+        else:
+            await interaction.response.send_message("Ошибка: роль не найдена.", ephemeral=True)
+
+    button.callback = button_callback
+    view = discord.ui.View()
+    view.add_item(button)
+    await ctx.send(embed=embed, view=view)
 
 @bot.event
 async def on_ready():
-    bot.add_view(VerificationView())
     print("Бот готов к работе!")
 
-# 4. СЮДА ВСТАВЬ СВОЙ ТОКЕН
-bot.run(os.environ["TOKEN"])
+bot.run(os.environ['TOKEN'])
