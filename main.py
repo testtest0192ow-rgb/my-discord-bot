@@ -13,35 +13,33 @@ async def setup(ctx):
 
     embed = discord.Embed(
         title="✨ ВЕРИФИКАЦИЯ WERTIX", 
-        description="Добро пожаловать на WERTIX! Нажми кнопку ниже, чтобы подтвердить участие и получить доступ к каналам.",
+        description="Нажми кнопку ниже, чтобы получить доступ.",
         color=0x2b2d31
     )
-    embed.set_image(url="https://cdn.discordapp.com/attachments/1523336809063518318/1524041464143675492/file_00000000bfa07.jpg")
-    embed.add_field(name="📜 Правила", value="Уважение и адекватность — залог нашего комьюнити.", inline=False)
     
     button = discord.ui.Button(label="ПРОЙТИ ВЕРИФИКАЦИЮ", style=discord.ButtonStyle.primary, emoji="🛡️")
 
     async def button_callback(interaction: discord.Interaction):
-        # ID роли верификации (verified)
-        v_role = discord.utils.get(interaction.guild.roles, id=1523339212517019729)
-        # ID роли анвериф (unverified)
-        u_role = discord.utils.get(interaction.guild.roles, id=1523796444312637621)
+        # Вставь сюда ID ролей
+        v_role_id = 1523339212517019729
+        u_role_id = 1523796444312637621
         
-        if v_role:
-            await interaction.user.add_roles(v_role)
-            if u_role: 
-                await interaction.user.remove_roles(u_role)
-            await interaction.response.send_message("Доступ открыт!", ephemeral=True)
-        else:
-            await interaction.response.send_message("Ошибка: Роли не найдены. Проверьте ID.", ephemeral=True)
-    
+        guild = interaction.guild
+        v_role = guild.get_role(v_role_id)
+        u_role = guild.get_role(u_role_id)
+        
+        try:
+            if v_role: await interaction.user.add_roles(v_role)
+            if u_role: await interaction.user.remove_roles(u_role)
+            await interaction.response.send_message("✅ Готово!", ephemeral=True)
+        except discord.Forbidden:
+            await interaction.response.send_message("❌ Ошибка: У меня нет прав менять роли (подними мою роль выше в настройках сервера!)", ephemeral=True)
+        except Exception as e:
+            await interaction.response.send_message(f"❌ Ошибка: {str(e)}", ephemeral=True)
+
     button.callback = button_callback
     view = discord.ui.View()
     view.add_item(button)
     await ctx.send(embed=embed, view=view)
-
-@bot.event
-async def on_ready():
-    print("Бот запущен и готов к работе!")
 
 bot.run(os.environ['TOKEN'])
